@@ -1,28 +1,87 @@
-== README
+# Xperior API
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# Technology
 
-Things you may want to cover:
+## Data
 
-* Ruby version
+Database - Xperior
 
-* System dependencies
+## Platform
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- Ruby on Rails 5.1.4 with Ruby 2.3.1, RSpec isolation & integration test suite
+  - Dependencies specified in Gemfile
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+## Tests
+
+Tests written using RSpec. Style validation via Rubocop.
+
+````
+$ rspec && rubocop
+````
+
+Testing Philosophy, following recommendations in https://www.destroyallsoftware.com/screencasts/catalog/web-apps-when-to-test-in-isolation, ie:
+
+- routes & controllers - integration using RSpec feature tests
+- lib classes - isolation
+- models - integration
+
+
+### Notes
+
+Active record based Rails application
+
+# Architecture
+
+The following descriptions provide an overview of the overall system.
+
+The overall architecture consists of a set of micro-services that provide units of functionality
+
+- Xperior-app-1
+JSON API only service providing access to users and authenticating user email and password to return an auth token.
+
+- Xperior-app-2
+JSON API only service providing access to properties to authenticated users
+
+Both the JSON APIs are protected with Basic Auth - see secrets file for credentials
+
+## Code
+
+Checkout the following projects directory from Git:
+
+- https://github.com/Priyankasahas/xperior-app-1
+- https://github.com/Priyankasahas/xperior-app-2
+
+Run bundle in each project.
+
+## Databases
+
+'Xperior' require MySQL 5.6 database configurations in the config/database.yml
+
+## Starting
+
+- Run Xperior-app-2
+- Run Xperior-app-1 on port 4000
+- Seed first (first_name, last_name, email, password, password_confirmation) to the DB
+
+## Curl requests to CRUD properties
+- NOTE: Replace user email, password and token with your seeded user details.
+
+- GET Authentication token using basic auth for API
+- curl -d '{"email":"priyanka.patel@email.com","password":"Testing123#"}' -H "Content-Type: application/json" -X POST http://api_user:api_password@localhost:4000/authentication
+
+- CRUD Properties using authentication token and basic auth for API
+- INDEX
+- curl -d '{"token":"YKkZHCGvA5VYH+Bh"}' -H "Content-Type: application/json" -X GET http://properties_api_user:properties_api_password@localhost:3000/properties
+
+- CREATE
+- curl -d '{"token":"YKkZHCGvA5VYH+Bh","property":{"building_name":"CommonWealth Bank","address":"123 Park Streetourne"}}' -H "Content-Type: application/json" -X POST http://properties_api_user:properties_api_password@localhost:3000/properties
+
+- SHOW
+- curl -d '{"token":"YKkZHCGvA5VYH+Bh"}' -H "Content-Type: application/json" -X GET http://properties_api_user:properties_api_password@localhost:3000/properties/1
+
+- UPDATE
+- curl -d '{"token":"YKkZHCGvA5VYH+Bh","property":{"address":"123 Park Street, Melbourne"}}' -H "Content-Type: application/json" -X PUT http://properties_api_user:properties_api_password@localhost:3000/properties/1
+
+- DELETE
+- curl -d '{"token":"YKkZHCGvA5VYH+Bh"}' -H "Content-Type: application/json" -X DELETE http://properties_api_user:properties_api_password@localhost:3000/properties/1
